@@ -5,25 +5,39 @@ class Program
 {
     static void Main()
     {
+        bool instructionEnabled = true;
+
         string inputPath = "input.txt";
         string input = File.ReadAllText(inputPath);
 
-        Regex regex = new Regex(@"mul\((?<X>\d+),(?<Y>\d+)\)");
-        MatchCollection matches = regex.Matches(input);
+            Regex sectionRegex = new Regex(@"(do\(\))|(don't\(\))|mul\((\d+),(\d+)\)");
 
-        int sum = 0;
+            int totalSum = 0;
+            bool enabled = true;
 
-        foreach (Match match in matches)
-        {
-            if (match.Success)
+            MatchCollection matches = sectionRegex.Matches(input);
+
+            foreach (Match match in matches)
             {
-                int x = int.Parse(match.Groups["X"].Value);
-                int y = int.Parse(match.Groups["Y"].Value);
-
-                sum += x * y;
+                if (match.Groups[1].Success) // Match for 'do()'
+                {
+                    enabled = true;
+                }
+                else if (match.Groups[2].Success) // Match for 'don't()'
+                {
+                    enabled = false;
+                }
+                else if (match.Groups[3].Success) // Match for 'mul(x, y)'
+                {
+                    if (enabled)
+                    {
+                        int x = int.Parse(match.Groups[3].Value);
+                        int y = int.Parse(match.Groups[4].Value);
+                        totalSum += x * y;
+                    }
+                }
             }
-        }
 
-        Console.WriteLine($"Total sum: {sum}");
+            Console.WriteLine(totalSum);
     }
 }
