@@ -8,6 +8,15 @@ class Program
     {
         string filePath = "input.txt";
         string[] lines = File.ReadAllLines(filePath);
+        char[,] input = new char[lines.Length, lines[0].Length];
+
+        for (int i = 0; i < input.GetLength(0); i++)
+        {
+            for (int j = 0; j < input.GetLength(1); j++)
+            {
+                input[i, j] = lines[i][j];
+            }
+        }
         
         Regex xmas = new Regex(@"XMAS");
         Regex samx = new Regex(@"SAMX");
@@ -17,6 +26,29 @@ class Program
         count += CheckDiagonally(xmas, lines) + CheckDiagonally(samx, lines);
 
         Console.WriteLine(count);
+
+        CheckPart2(input);
+    }
+
+    static int CheckPart2(char[,] input) 
+    {
+        int count = 0;
+
+        for (int i = 1; i < input.GetLength(0) - 1; i++)
+        {
+            for (int j = 1; j < input.GetLength(1) - 1; j++)
+            {
+                if (input[i, j] != 'A') continue;
+                if (input[i - 1, j - 1] == 'M' && input[i + 1, j + 1] == 'S' || input[i + 1, j + 1] == 'M' && input[i - 1, j - 1] == 'S') 
+                {
+                    if (!(input[i - 1, j + 1] == 'M' && input[i + 1, j - 1] == 'S' || input[i + 1, j - 1] == 'M' && input[i - 1, j + 1] == 'S')) continue;
+                    count++;
+                }
+            }
+        }
+
+        Console.WriteLine(count);
+        return count;
     }
 
     static int CheckHorizontally(Regex word, string[] lines)
@@ -99,14 +131,7 @@ class Program
             diagonalLines.Add(diagonal);
         }
 
-        foreach (string diagonal in diagonalLines)
-        {
-            Console.WriteLine(diagonal);
-        }
-
-
         int count = 0;
-
         foreach (string line in diagonalLines)
         {
             MatchCollection matches = word.Matches(line);
